@@ -1,20 +1,79 @@
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.io.IOException;
+
 public class Interface {
     private JPanel MainInterface;
     private JTextField UserInput;
     private JButton FindStats;
-    private JLabel PlayerResults;
+    private JLabel PlayerPosition;
+    private JLabel PlayerLastSeasonPlayed;
+    private JLabel PlayerTeam;
+    private JLabel PlayerLeague;
+    private JLabel PlayerGamesPlayed;
+    private JLabel NonGoalieInfo;
+    private JLabel GoalieInfo;
 
     public Interface() {
         FindStats.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                PlayerResults.setText(UserInput.getText());
+                // 1. get the inputted text, then come up with all the data
+                Document document;
+                Element dataRow;
+                String completedURL;
+
+//        System.out.println("NHL PLAYER STATS FINDER \n");
+//        System.out.println("Finds the latest statistics for the player in their most recent NHL season \n");
+//        System.out.println("Please enter in the full name of the player you would like statistics for. \n" + "Name entered must be a valid player " +
+//                "If player has middle name, enter middle name's capitalization exactly. Other capitalizations don't matter");
+
+                while (true) {
+                    try {
+                        completedURL = MakeURL.createURL(UserInput.getText());
+                        document = Connection.connect(completedURL);
+                        break;
+                    } catch (IOException f) {
+                        continue;
+                    }
+                }
+
+
+                // set 1st field of GUI output
+                dataRow = DataSelection.selectData(document);
+
+                if (Player.isGoaltender(document)) {
+                    Goaltender goaltender = Goaltender.goalieInfo(document, dataRow);
+                    PlayerPosition.setText("Position: " + Player.getPosition(document));
+                    PlayerLastSeasonPlayed.setText("Last Season Played: " + goaltender.lastSeasonPlayed);
+                    PlayerTeam.setText("Last Team Played For: " + goaltender.lastTeamPlayedFor);
+                    PlayerLeague.setText("League: " + goaltender.league);
+                    PlayerGamesPlayed.setText("Games Played: " + goaltender.gamesPlayed);
+
+                    GoalieInfo.setText("Wins: " + goaltender.wins + "Loses: " + goaltender.loses + "Overtime Loses : " + goaltender.overtimeLoses +
+                            "Total Minutes: " + goaltender.totalMinutes + "Goals Allowed: " + goaltender.goalsAllowed +
+                            "Goals Allowed Average: " + goaltender.goalsAllowedAverage + "Shutouts: " + goaltender.shutouts +
+                            "Save percentage: " + goaltender.savePercentage);
+
+                } else {
+                    NonGoaltender nonGoalie = NonGoaltender.nonGoalieInfo(document, dataRow);
+                    PlayerPosition.setText("Position: " + Player.getPosition(document));
+                    PlayerLastSeasonPlayed.setText("Last Season Played: " + nonGoalie.lastSeasonPlayed);
+                    PlayerTeam.setText("Last Team Played For: " + nonGoalie.lastTeamPlayedFor);
+                    PlayerLeague.setText("League: " + nonGoalie.league);
+                    PlayerGamesPlayed.setText("Games Played: " + nonGoalie.gamesPlayed);
+
+                    NonGoalieInfo.setText("Goals: " + nonGoalie.goals + "Assists: " + nonGoalie.assists +
+                            "Points: " + nonGoalie.points + "Penalty in Minutes: " + nonGoalie.penaltyInMinutes);
+
+                }
 
             }
         });
@@ -63,12 +122,21 @@ public class Interface {
      */
     private void $$$setupUI$$$() {
         MainInterface = new JPanel();
-        MainInterface.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1, true, true));
-        MainInterface.setBackground(new Color(-10858516));
+        MainInterface.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(7, 9, new Insets(0, 0, 0, 0), -1, -1));
+        MainInterface.setBackground(new Color(-6505236));
         MainInterface.setEnabled(true);
+        MainInterface.setPreferredSize(new Dimension(200, 200));
         MainInterface.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-16777216)), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, new Color(-16777216)));
-        UserInput = new JTextField();
-        MainInterface.add(UserInput, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 3, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        final JLabel label1 = new JLabel();
+        label1.setBackground(new Color(-16777216));
+        label1.setEnabled(false);
+        Font label1Font = this.$$$getFont$$$("Trebuchet MS", Font.PLAIN, 20, label1.getFont());
+        if (label1Font != null) label1.setFont(label1Font);
+        label1.setForeground(new Color(-14013460));
+        label1.setHorizontalAlignment(0);
+        label1.setHorizontalTextPosition(0);
+        label1.setText("NHL PLAYER STATS FINDER");
+        MainInterface.add(label1, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 9, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_NORTH, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(600, 10), null, 0, false));
         FindStats = new JButton();
         FindStats.setBackground(new Color(-13833197));
         FindStats.setEnabled(true);
@@ -77,19 +145,30 @@ public class Interface {
         FindStats.setForeground(new Color(-13833197));
         FindStats.setHideActionText(false);
         FindStats.setText("Find the Stats!");
-        MainInterface.add(FindStats, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        PlayerResults = new JLabel();
-        PlayerResults.setText("");
-        MainInterface.add(PlayerResults, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label1 = new JLabel();
-        label1.setBackground(new Color(-14013460));
-        label1.setEnabled(false);
-        Font label1Font = this.$$$getFont$$$("Trebuchet MS", Font.PLAIN, 20, label1.getFont());
-        if (label1Font != null) label1.setFont(label1Font);
-        label1.setHorizontalAlignment(0);
-        label1.setHorizontalTextPosition(0);
-        label1.setText("NHL PLAYER STATS FINDER");
-        MainInterface.add(label1, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        MainInterface.add(FindStats, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 9, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(537, 27), null, 0, false));
+        UserInput = new JTextField();
+        MainInterface.add(UserInput, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 9, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        PlayerPosition = new JLabel();
+        PlayerPosition.setText("");
+        MainInterface.add(PlayerPosition, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 9, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(537, 0), null, 0, false));
+        PlayerLastSeasonPlayed = new JLabel();
+        PlayerLastSeasonPlayed.setText("");
+        MainInterface.add(PlayerLastSeasonPlayed, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 9, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        PlayerTeam = new JLabel();
+        PlayerTeam.setText("");
+        MainInterface.add(PlayerTeam, new com.intellij.uiDesigner.core.GridConstraints(5, 0, 1, 5, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        PlayerLeague = new JLabel();
+        PlayerLeague.setText("");
+        MainInterface.add(PlayerLeague, new com.intellij.uiDesigner.core.GridConstraints(5, 5, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        PlayerGamesPlayed = new JLabel();
+        PlayerGamesPlayed.setText("");
+        MainInterface.add(PlayerGamesPlayed, new com.intellij.uiDesigner.core.GridConstraints(6, 5, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        NonGoalieInfo = new JLabel();
+        NonGoalieInfo.setText("");
+        MainInterface.add(NonGoalieInfo, new com.intellij.uiDesigner.core.GridConstraints(6, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        GoalieInfo = new JLabel();
+        GoalieInfo.setText("In");
+        MainInterface.add(GoalieInfo, new com.intellij.uiDesigner.core.GridConstraints(6, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
