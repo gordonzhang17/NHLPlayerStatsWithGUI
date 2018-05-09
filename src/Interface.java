@@ -2,27 +2,38 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.IOException;
 
 public class Interface {
-    private JPanel MainInterface;
-    private JTextField UserInput;
-    private JButton FindStats;
-    private JLabel PlayerPosition;
-    private JLabel PlayerLastSeasonPlayed;
-    private JLabel PlayerTeam;
-    private JLabel PlayerLeague;
-    private JLabel PlayerGamesPlayed;
-    private JLabel NonGoalieInfo;
-    private JLabel GoalieInfo;
+    public JLabel title;
+    public JTextField userInput;
+    public JButton findStats;
+    public JLabel position;
+    public JLabel lastSeasonPlayed;
+    public JLabel team;
+    public JLabel league;
+    public JLabel gamesPlayed;
+    public JPanel Interface;
+    public JLabel goals;
+    public JLabel assists;
+    public JLabel points;
+    public JLabel penaltyInMinutes;
+    public JLabel wins;
+    public JLabel loses;
+    public JLabel overtimeLoses;
+    public JLabel totalMinutes;
+    public JLabel goalsAllowed;
+    public JLabel shutouts;
+    public JLabel savePercentage;
+    public JLabel goalsAllowedAverage;
+
+    public static JFrame frame;
 
     public Interface() {
-        FindStats.addActionListener(new ActionListener() {
+        findStats.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // 1. get the inputted text, then come up with all the data
@@ -30,49 +41,50 @@ public class Interface {
                 Element dataRow;
                 String completedURL;
 
-//        System.out.println("NHL PLAYER STATS FINDER \n");
-//        System.out.println("Finds the latest statistics for the player in their most recent NHL season \n");
-//        System.out.println("Please enter in the full name of the player you would like statistics for. \n" + "Name entered must be a valid player " +
-//                "If player has middle name, enter middle name's capitalization exactly. Other capitalizations don't matter");
+//                frame.getContentPane().removeAll();
+//                startUp();
 
                 while (true) {
                     try {
-                        completedURL = MakeURL.createURL(UserInput.getText());
+                        completedURL = MakeURL.createURL(userInput.getText());
                         document = Connection.connect(completedURL);
                         break;
                     } catch (IOException f) {
                         continue;
                     }
                 }
-
-
-                // set 1st field of GUI output
                 dataRow = DataSelection.selectData(document);
 
                 if (Player.isGoaltender(document)) {
                     Goaltender goaltender = Goaltender.goalieInfo(document, dataRow);
-                    PlayerPosition.setText("Position: " + Player.getPosition(document));
-                    PlayerLastSeasonPlayed.setText("Last Season Played: " + goaltender.lastSeasonPlayed);
-                    PlayerTeam.setText("Last Team Played For: " + goaltender.lastTeamPlayedFor);
-                    PlayerLeague.setText("League: " + goaltender.league);
-                    PlayerGamesPlayed.setText("Games Played: " + goaltender.gamesPlayed);
+                    position.setText("Position: " + Player.getPosition(document));
+                    lastSeasonPlayed.setText("Last Season Played: " + goaltender.lastSeasonPlayed);
+                    team.setText("Last Team Played For: " + goaltender.lastTeamPlayedFor);
+                    league.setText("League: " + goaltender.league);
+                    gamesPlayed.setText("Games Played: " + goaltender.gamesPlayed);
 
-                    GoalieInfo.setText("Wins: " + goaltender.wins + "Loses: " + goaltender.loses + "Overtime Loses : " + goaltender.overtimeLoses +
-                            "Total Minutes: " + goaltender.totalMinutes + "Goals Allowed: " + goaltender.goalsAllowed +
-                            "Goals Allowed Average: " + goaltender.goalsAllowedAverage + "Shutouts: " + goaltender.shutouts +
-                            "Save percentage: " + goaltender.savePercentage);
+                    wins.setText("Wins: " + goaltender.wins);
+                    loses.setText("Loses: " + goaltender.loses);
+                    overtimeLoses.setText("Overtime Loses: " + goaltender.overtimeLoses);
+                    totalMinutes.setText("Total Minutes: " + goaltender.totalMinutes);
+                    goalsAllowed.setText("Goals Allowed: " + goaltender.goalsAllowed);
+                    goalsAllowedAverage.setText("Goals Allowed Average: " + goaltender.goalsAllowedAverage);
+                    shutouts.setText("Shutouts" + goaltender.shutouts);
+                    savePercentage.setText("Save Percentage: " + goaltender.savePercentage);
 
                 } else {
+
                     NonGoaltender nonGoalie = NonGoaltender.nonGoalieInfo(document, dataRow);
-                    PlayerPosition.setText("Position: " + Player.getPosition(document));
-                    PlayerLastSeasonPlayed.setText("Last Season Played: " + nonGoalie.lastSeasonPlayed);
-                    PlayerTeam.setText("Last Team Played For: " + nonGoalie.lastTeamPlayedFor);
-                    PlayerLeague.setText("League: " + nonGoalie.league);
-                    PlayerGamesPlayed.setText("Games Played: " + nonGoalie.gamesPlayed);
+                    position.setText("Position: " + Player.getPosition(document));
+                    lastSeasonPlayed.setText("Last Season Played: " + nonGoalie.lastSeasonPlayed);
+                    team.setText("Last Team Played For: " + nonGoalie.lastTeamPlayedFor);
+                    league.setText("League: " + nonGoalie.league);
+                    gamesPlayed.setText("Games Played: " + nonGoalie.gamesPlayed);
 
-                    NonGoalieInfo.setText("Goals: " + nonGoalie.goals + "Assists: " + nonGoalie.assists +
-                            "Points: " + nonGoalie.points + "Penalty in Minutes: " + nonGoalie.penaltyInMinutes);
-
+                    goals.setText("Goals: " + nonGoalie.goals);
+                    assists.setText("Assists: " + nonGoalie.assists);
+                    points.setText("Points: " + nonGoalie.points);
+                    penaltyInMinutes.setText("Penalty in Minutes: " + nonGoalie.penaltyInMinutes);
                 }
 
             }
@@ -80,31 +92,17 @@ public class Interface {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Interface");
-        frame.setContentPane(new Interface().MainInterface);
+        startUp();
+    }
+
+    public static void startUp() {
+        frame = new JFrame("Interface");
+        frame.setContentPane(new Interface().Interface);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
     }
 
-    /**
-     * @noinspection ALL
-     */
-    private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
-        if (currentFont == null) return null;
-        String resultName;
-        if (fontName == null) {
-            resultName = currentFont.getName();
-        } else {
-            Font testFont = new Font(fontName, Font.PLAIN, 10);
-            if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
-                resultName = fontName;
-            } else {
-                resultName = currentFont.getName();
-            }
-        }
-        return new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
-    }
 
     {
 // GUI initializer generated by IntelliJ IDEA GUI Designer
@@ -121,60 +119,201 @@ public class Interface {
      * @noinspection ALL
      */
     private void $$$setupUI$$$() {
-        MainInterface = new JPanel();
-        MainInterface.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(7, 9, new Insets(0, 0, 0, 0), -1, -1));
-        MainInterface.setBackground(new Color(-6505236));
-        MainInterface.setEnabled(true);
-        MainInterface.setPreferredSize(new Dimension(200, 200));
-        MainInterface.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-16777216)), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, new Color(-16777216)));
-        final JLabel label1 = new JLabel();
-        label1.setBackground(new Color(-16777216));
-        label1.setEnabled(false);
-        Font label1Font = this.$$$getFont$$$("Trebuchet MS", Font.PLAIN, 20, label1.getFont());
-        if (label1Font != null) label1.setFont(label1Font);
-        label1.setForeground(new Color(-14013460));
-        label1.setHorizontalAlignment(0);
-        label1.setHorizontalTextPosition(0);
-        label1.setText("NHL PLAYER STATS FINDER");
-        MainInterface.add(label1, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 9, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_NORTH, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(600, 10), null, 0, false));
-        FindStats = new JButton();
-        FindStats.setBackground(new Color(-13833197));
-        FindStats.setEnabled(true);
-        Font FindStatsFont = this.$$$getFont$$$("Trebuchet MS", Font.PLAIN, 20, FindStats.getFont());
-        if (FindStatsFont != null) FindStats.setFont(FindStatsFont);
-        FindStats.setForeground(new Color(-13833197));
-        FindStats.setHideActionText(false);
-        FindStats.setText("Find the Stats!");
-        MainInterface.add(FindStats, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 9, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(537, 27), null, 0, false));
-        UserInput = new JTextField();
-        MainInterface.add(UserInput, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 9, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        PlayerPosition = new JLabel();
-        PlayerPosition.setText("");
-        MainInterface.add(PlayerPosition, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 9, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(537, 0), null, 0, false));
-        PlayerLastSeasonPlayed = new JLabel();
-        PlayerLastSeasonPlayed.setText("");
-        MainInterface.add(PlayerLastSeasonPlayed, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 9, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        PlayerTeam = new JLabel();
-        PlayerTeam.setText("");
-        MainInterface.add(PlayerTeam, new com.intellij.uiDesigner.core.GridConstraints(5, 0, 1, 5, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        PlayerLeague = new JLabel();
-        PlayerLeague.setText("");
-        MainInterface.add(PlayerLeague, new com.intellij.uiDesigner.core.GridConstraints(5, 5, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        PlayerGamesPlayed = new JLabel();
-        PlayerGamesPlayed.setText("");
-        MainInterface.add(PlayerGamesPlayed, new com.intellij.uiDesigner.core.GridConstraints(6, 5, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        NonGoalieInfo = new JLabel();
-        NonGoalieInfo.setText("");
-        MainInterface.add(NonGoalieInfo, new com.intellij.uiDesigner.core.GridConstraints(6, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        GoalieInfo = new JLabel();
-        GoalieInfo.setText("In");
-        MainInterface.add(GoalieInfo, new com.intellij.uiDesigner.core.GridConstraints(6, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        Interface = new JPanel();
+        Interface.setLayout(new GridBagLayout());
+        Interface.setPreferredSize(new Dimension(600, 300));
+        final JPanel spacer1 = new JPanel();
+        GridBagConstraints gbc;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        Interface.add(spacer1, gbc);
+        final JPanel spacer2 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        Interface.add(spacer2, gbc);
+        final JPanel spacer3 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        Interface.add(spacer3, gbc);
+        position = new JLabel();
+        position.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        Interface.add(position, gbc);
+        lastSeasonPlayed = new JLabel();
+        lastSeasonPlayed.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 6;
+        Interface.add(lastSeasonPlayed, gbc);
+        team = new JLabel();
+        team.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 6;
+        Interface.add(team, gbc);
+        league = new JLabel();
+        league.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 6;
+        Interface.add(league, gbc);
+        gamesPlayed = new JLabel();
+        gamesPlayed.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 8;
+        gbc.gridy = 6;
+        Interface.add(gamesPlayed, gbc);
+        title = new JLabel();
+        title.setText("NHLPlayerStats");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTH;
+        Interface.add(title, gbc);
+        userInput = new JTextField();
+        userInput.setMinimumSize(new Dimension(50, 23));
+        userInput.setPreferredSize(new Dimension(50, 28));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        Interface.add(userInput, gbc);
+        findStats = new JButton();
+        findStats.setText("Find Stats!");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 4;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        Interface.add(findStats, gbc);
+        final JPanel spacer4 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        Interface.add(spacer4, gbc);
+        final JPanel spacer5 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 6;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        Interface.add(spacer5, gbc);
+        final JPanel spacer6 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 5;
+        gbc.gridy = 6;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        Interface.add(spacer6, gbc);
+        final JPanel spacer7 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 7;
+        gbc.gridy = 6;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        Interface.add(spacer7, gbc);
+        goals = new JLabel();
+        goals.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(goals, gbc);
+        assists = new JLabel();
+        assists.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 7;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(assists, gbc);
+        points = new JLabel();
+        points.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 7;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(points, gbc);
+        penaltyInMinutes = new JLabel();
+        penaltyInMinutes.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 7;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(penaltyInMinutes, gbc);
+        wins = new JLabel();
+        wins.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(wins, gbc);
+        loses = new JLabel();
+        loses.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(loses, gbc);
+        overtimeLoses = new JLabel();
+        overtimeLoses.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(overtimeLoses, gbc);
+        totalMinutes = new JLabel();
+        totalMinutes.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(totalMinutes, gbc);
+        final JPanel spacer8 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 9;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        Interface.add(spacer8, gbc);
+        goalsAllowed = new JLabel();
+        goalsAllowed.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 8;
+        gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(goalsAllowed, gbc);
+        savePercentage = new JLabel();
+        savePercentage.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 10;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(savePercentage, gbc);
+        shutouts = new JLabel();
+        shutouts.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 10;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(shutouts, gbc);
+        goalsAllowedAverage = new JLabel();
+        goalsAllowedAverage.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 10;
+        gbc.anchor = GridBagConstraints.WEST;
+        Interface.add(goalsAllowedAverage, gbc);
     }
 
     /**
      * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
-        return MainInterface;
+        return Interface;
     }
 }
