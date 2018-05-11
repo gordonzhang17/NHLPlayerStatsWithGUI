@@ -5,7 +5,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 public class Interface {
     public JLabel title;
@@ -29,80 +28,121 @@ public class Interface {
     public JLabel shutouts;
     public JLabel savePercentage;
     public JLabel goalsAllowedAverage;
+    public JLabel error;
 
-    public static JFrame frame;
+    private boolean pass = true;
 
     public Interface() {
+
         findStats.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // 1. get the inputted text, then come up with all the data
-                Document document;
-                Element dataRow;
+                Document document = null;
+                Element dataRow = null;
                 String completedURL;
 
-//                frame.getContentPane().removeAll();
-//                startUp();
-
-                while (true) {
-                    try {
-                        completedURL = MakeURL.createURL(userInput.getText());
-                        document = Connection.connect(completedURL);
-                        break;
-                    } catch (IOException f) {
-                        continue;
-                    }
-                }
-                dataRow = DataSelection.selectData(document);
-
-                if (Player.isGoaltender(document)) {
-                    Goaltender goaltender = Goaltender.goalieInfo(document, dataRow);
-                    position.setText("Position: " + Player.getPosition(document));
-                    lastSeasonPlayed.setText("Last Season Played: " + goaltender.lastSeasonPlayed);
-                    team.setText("Last Team Played For: " + goaltender.lastTeamPlayedFor);
-                    league.setText("League: " + goaltender.league);
-                    gamesPlayed.setText("Games Played: " + goaltender.gamesPlayed);
-
-                    wins.setText("Wins: " + goaltender.wins);
-                    loses.setText("Loses: " + goaltender.loses);
-                    overtimeLoses.setText("Overtime Loses: " + goaltender.overtimeLoses);
-                    totalMinutes.setText("Total Minutes: " + goaltender.totalMinutes);
-                    goalsAllowed.setText("Goals Allowed: " + goaltender.goalsAllowed);
-                    goalsAllowedAverage.setText("Goals Allowed Average: " + goaltender.goalsAllowedAverage);
-                    shutouts.setText("Shutouts" + goaltender.shutouts);
-                    savePercentage.setText("Save Percentage: " + goaltender.savePercentage);
+                if (pass) {
+                    // do nothing, 1st time through
+                    pass = false;
 
                 } else {
+                    position.setText(null);
+                    lastSeasonPlayed.setText(null);
+                    team.setText(null);
+                    league.setText(null);
+                    gamesPlayed.setText(null);
 
-                    NonGoaltender nonGoalie = NonGoaltender.nonGoalieInfo(document, dataRow);
-                    position.setText("Position: " + Player.getPosition(document));
-                    lastSeasonPlayed.setText("Last Season Played: " + nonGoalie.lastSeasonPlayed);
-                    team.setText("Last Team Played For: " + nonGoalie.lastTeamPlayedFor);
-                    league.setText("League: " + nonGoalie.league);
-                    gamesPlayed.setText("Games Played: " + nonGoalie.gamesPlayed);
+                    wins.setText(null);
+                    loses.setText(null);
+                    overtimeLoses.setText(null);
+                    totalMinutes.setText(null);
+                    goalsAllowed.setText(null);
+                    goalsAllowedAverage.setText(null);
+                    shutouts.setText(null);
+                    savePercentage.setText(null);
 
-                    goals.setText("Goals: " + nonGoalie.goals);
-                    assists.setText("Assists: " + nonGoalie.assists);
-                    points.setText("Points: " + nonGoalie.points);
-                    penaltyInMinutes.setText("Penalty in Minutes: " + nonGoalie.penaltyInMinutes);
+                    goals.setText(null);
+                    assists.setText(null);
+                    points.setText(null);
+                    penaltyInMinutes.setText(null);
+
+                    error.setText(null);
+
                 }
 
+                try {
+                    completedURL = MakeURL.createURL(userInput.getText());
+                    document = Connection.connect(completedURL);
+                    dataRow = DataSelection.selectData(document);
+                    if (Player.isGoaltender(document)) {
+                        Goaltender goaltender = Goaltender.goalieInfo(document, dataRow);
+                        position.setText("Position: " + Player.getPosition(document));
+                        lastSeasonPlayed.setText("Last Season Played: " + goaltender.lastSeasonPlayed);
+                        team.setText("Last Team Played For: " + goaltender.lastTeamPlayedFor);
+                        league.setText("League: " + goaltender.league);
+                        gamesPlayed.setText("Games Played: " + goaltender.gamesPlayed);
+
+                        wins.setText("Wins: " + goaltender.wins);
+                        loses.setText("Loses: " + goaltender.loses);
+                        overtimeLoses.setText("Overtime Loses: " + goaltender.overtimeLoses);
+                        totalMinutes.setText("Total Minutes: " + goaltender.totalMinutes);
+                        goalsAllowed.setText("Goals Allowed: " + goaltender.goalsAllowed);
+                        goalsAllowedAverage.setText("Goals Allowed Average: " + goaltender.goalsAllowedAverage);
+                        shutouts.setText("Shutouts" + goaltender.shutouts);
+                        savePercentage.setText("Save Percentage: " + goaltender.savePercentage);
+
+                    } else {
+
+                        NonGoaltender nonGoalie = NonGoaltender.nonGoalieInfo(document, dataRow);
+                        position.setText("Position: " + Player.getPosition(document));
+                        lastSeasonPlayed.setText("Last Season Played: " + nonGoalie.lastSeasonPlayed);
+                        team.setText("Last Team Played For: " + nonGoalie.lastTeamPlayedFor);
+                        league.setText("League: " + nonGoalie.league);
+                        gamesPlayed.setText("Games Played: " + nonGoalie.gamesPlayed);
+
+                        goals.setText("Goals: " + nonGoalie.goals);
+                        assists.setText("Assists: " + nonGoalie.assists);
+                        points.setText("Points: " + nonGoalie.points);
+                        penaltyInMinutes.setText("Penalty in Minutes: " + nonGoalie.penaltyInMinutes);
+                    }
+                } catch (Exception f) {
+                    error.setText("Cannot find this player. " + "Enter correct name or another player's name.");
+                }
+
+
             }
+
         });
+
     }
 
     public static void main(String[] args) {
-        startUp();
-    }
-
-    public static void startUp() {
-        frame = new JFrame("Interface");
+        JFrame frame = new JFrame("Interface");
         frame.setContentPane(new Interface().Interface);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
     }
 
+    /**
+     * @noinspection ALL
+     */
+    private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
+        if (currentFont == null) return null;
+        String resultName;
+        if (fontName == null) {
+            resultName = currentFont.getName();
+        } else {
+            Font testFont = new Font(fontName, Font.PLAIN, 10);
+            if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
+                resultName = fontName;
+            } else {
+                resultName = currentFont.getName();
+            }
+        }
+        return new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
+    }
 
     {
 // GUI initializer generated by IntelliJ IDEA GUI Designer
@@ -121,6 +161,9 @@ public class Interface {
     private void $$$setupUI$$$() {
         Interface = new JPanel();
         Interface.setLayout(new GridBagLayout());
+        Interface.setBackground(new Color(-12325849));
+        Interface.setEnabled(false);
+        Interface.setMinimumSize(new Dimension(10000, 10000));
         Interface.setPreferredSize(new Dimension(600, 300));
         final JPanel spacer1 = new JPanel();
         GridBagConstraints gbc;
@@ -142,45 +185,60 @@ public class Interface {
         gbc.fill = GridBagConstraints.VERTICAL;
         Interface.add(spacer3, gbc);
         position = new JLabel();
+        Font positionFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, position.getFont());
+        if (positionFont != null) position.setFont(positionFont);
         position.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 6;
         Interface.add(position, gbc);
         lastSeasonPlayed = new JLabel();
+        Font lastSeasonPlayedFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, lastSeasonPlayed.getFont());
+        if (lastSeasonPlayedFont != null) lastSeasonPlayed.setFont(lastSeasonPlayedFont);
         lastSeasonPlayed.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 6;
         Interface.add(lastSeasonPlayed, gbc);
         team = new JLabel();
+        Font teamFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, team.getFont());
+        if (teamFont != null) team.setFont(teamFont);
         team.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
         gbc.gridy = 6;
         Interface.add(team, gbc);
         league = new JLabel();
+        Font leagueFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, league.getFont());
+        if (leagueFont != null) league.setFont(leagueFont);
         league.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
         gbc.gridy = 6;
         Interface.add(league, gbc);
         gamesPlayed = new JLabel();
+        Font gamesPlayedFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, gamesPlayed.getFont());
+        if (gamesPlayedFont != null) gamesPlayed.setFont(gamesPlayedFont);
         gamesPlayed.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 8;
         gbc.gridy = 6;
         Interface.add(gamesPlayed, gbc);
         title = new JLabel();
-        title.setText("NHLPlayerStats");
+        Font titleFont = this.$$$getFont$$$("Trebuchet MS", -1, 36, title.getFont());
+        if (titleFont != null) title.setFont(titleFont);
+        title.setText("NHL Player Stats");
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTH;
         Interface.add(title, gbc);
         userInput = new JTextField();
+        Font userInputFont = this.$$$getFont$$$("Trebuchet MS", -1, 22, userInput.getFont());
+        if (userInputFont != null) userInput.setFont(userInputFont);
         userInput.setMinimumSize(new Dimension(50, 23));
         userInput.setPreferredSize(new Dimension(50, 28));
+        userInput.setText("Enter Player Name Here");
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
         gbc.gridy = 2;
@@ -188,6 +246,15 @@ public class Interface {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         Interface.add(userInput, gbc);
         findStats = new JButton();
+        findStats.setBackground(new Color(-12168212));
+        findStats.setBorderPainted(true);
+        findStats.setContentAreaFilled(true);
+        findStats.setDefaultCapable(true);
+        findStats.setEnabled(true);
+        Font findStatsFont = this.$$$getFont$$$("Trebuchet MS", -1, 20, findStats.getFont());
+        if (findStatsFont != null) findStats.setFont(findStatsFont);
+        findStats.setForeground(new Color(-16777216));
+        findStats.setHideActionText(true);
         findStats.setText("Find Stats!");
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
@@ -219,6 +286,8 @@ public class Interface {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         Interface.add(spacer7, gbc);
         goals = new JLabel();
+        Font goalsFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, goals.getFont());
+        if (goalsFont != null) goals.setFont(goalsFont);
         goals.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -226,6 +295,8 @@ public class Interface {
         gbc.anchor = GridBagConstraints.WEST;
         Interface.add(goals, gbc);
         assists = new JLabel();
+        Font assistsFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, assists.getFont());
+        if (assistsFont != null) assists.setFont(assistsFont);
         assists.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
@@ -233,6 +304,8 @@ public class Interface {
         gbc.anchor = GridBagConstraints.WEST;
         Interface.add(assists, gbc);
         points = new JLabel();
+        Font pointsFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, points.getFont());
+        if (pointsFont != null) points.setFont(pointsFont);
         points.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
@@ -240,6 +313,8 @@ public class Interface {
         gbc.anchor = GridBagConstraints.WEST;
         Interface.add(points, gbc);
         penaltyInMinutes = new JLabel();
+        Font penaltyInMinutesFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, penaltyInMinutes.getFont());
+        if (penaltyInMinutesFont != null) penaltyInMinutes.setFont(penaltyInMinutesFont);
         penaltyInMinutes.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
@@ -247,6 +322,8 @@ public class Interface {
         gbc.anchor = GridBagConstraints.WEST;
         Interface.add(penaltyInMinutes, gbc);
         wins = new JLabel();
+        Font winsFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, wins.getFont());
+        if (winsFont != null) wins.setFont(winsFont);
         wins.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -261,6 +338,8 @@ public class Interface {
         gbc.anchor = GridBagConstraints.WEST;
         Interface.add(loses, gbc);
         overtimeLoses = new JLabel();
+        Font overtimeLosesFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, overtimeLoses.getFont());
+        if (overtimeLosesFont != null) overtimeLoses.setFont(overtimeLosesFont);
         overtimeLoses.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
@@ -268,6 +347,8 @@ public class Interface {
         gbc.anchor = GridBagConstraints.WEST;
         Interface.add(overtimeLoses, gbc);
         totalMinutes = new JLabel();
+        Font totalMinutesFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, totalMinutes.getFont());
+        if (totalMinutesFont != null) totalMinutes.setFont(totalMinutesFont);
         totalMinutes.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
@@ -281,6 +362,8 @@ public class Interface {
         gbc.fill = GridBagConstraints.VERTICAL;
         Interface.add(spacer8, gbc);
         goalsAllowed = new JLabel();
+        Font goalsAllowedFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, goalsAllowed.getFont());
+        if (goalsAllowedFont != null) goalsAllowed.setFont(goalsAllowedFont);
         goalsAllowed.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 8;
@@ -288,6 +371,8 @@ public class Interface {
         gbc.anchor = GridBagConstraints.WEST;
         Interface.add(goalsAllowed, gbc);
         savePercentage = new JLabel();
+        Font savePercentageFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, savePercentage.getFont());
+        if (savePercentageFont != null) savePercentage.setFont(savePercentageFont);
         savePercentage.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 6;
@@ -295,6 +380,8 @@ public class Interface {
         gbc.anchor = GridBagConstraints.WEST;
         Interface.add(savePercentage, gbc);
         shutouts = new JLabel();
+        Font shutoutsFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, shutouts.getFont());
+        if (shutoutsFont != null) shutouts.setFont(shutoutsFont);
         shutouts.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
@@ -302,12 +389,22 @@ public class Interface {
         gbc.anchor = GridBagConstraints.WEST;
         Interface.add(shutouts, gbc);
         goalsAllowedAverage = new JLabel();
+        Font goalsAllowedAverageFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, goalsAllowedAverage.getFont());
+        if (goalsAllowedAverageFont != null) goalsAllowedAverage.setFont(goalsAllowedAverageFont);
         goalsAllowedAverage.setText("");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 10;
         gbc.anchor = GridBagConstraints.WEST;
         Interface.add(goalsAllowedAverage, gbc);
+        error = new JLabel();
+        Font errorFont = this.$$$getFont$$$("Trebuchet MS", -1, 24, error.getFont());
+        if (errorFont != null) error.setFont(errorFont);
+        error.setText("");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 11;
+        Interface.add(error, gbc);
     }
 
     /**
