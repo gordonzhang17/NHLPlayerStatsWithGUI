@@ -5,10 +5,11 @@
       <xy x="20" y="20" width="10000" height="10000"/>
     </constraints>
     <properties>
-      <background color="-12325849"/>
+      <background color="-12629012"/>
       <enabled value="false"/>
-      <minimumSize width="10000" height="10000"/>
-      <preferredSize width="10000" height="10000"/>
+      <maximumSize width="10000" height="10000"/>
+      <minimumSize width="1000" height="1000"/>
+      <preferredSize width="2000" height="2000"/>
     </properties>
     <border type="none"/>
     <children>

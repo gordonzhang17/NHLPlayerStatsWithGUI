@@ -3,42 +3,39 @@ import java.util.regex.Pattern;
 
 public class MakeURL {
 
-    public static String[] validNameChecker(String givenName) {
+    public static String[] validNameChecker(String givenName) throws Exception {
         String[] nameParts;
         while (true) {
-            Pattern pattern = Pattern.compile("^[\\p{L} .'-]+$"); // regex to check for spaces, valid A-Z characters
+            Pattern pattern = Pattern.compile("^[\\p{L} .'-]+$");
             Matcher matcher = pattern.matcher(givenName);
             if (matcher.matches()) {
                 nameParts = givenName.split(" ");
-//                for (int i =0 ; i< nameParts.length; i++) {
-//                    System.out.println(nameParts[i]);
-//                }
 
                 if (nameParts.length < 2 || nameParts.length > 3) {
-                    // TODO: shouldnt sout here, need to set the PlayerResult to be the error message
-                    System.out.println("Given name length too short or too long. Enter valid name");
+                    //System.out.println("Given name length too short or too long. Enter valid name");
+                    throw new Exception();
+
                     // no player's name should have less than 2 parts or more than 3 parts
                 } else {
                     break;
                 } // break when checked that the string is valid and i have split it up
             } else {
-                // TODO: shouldnt sout here, need to set the PlayerResult to be the error message
-                System.out.println("Invalid Name. Name must have only alphabetical letters. Enter valid name.");
+                throw new Exception();
+
             }
         }
-//        for (int i = 0; i < nameParts.length ; i++ ) {
-//            System.out.println(nameParts[i]);
-//        }
         return nameParts;
     }
 
-    // TODO:
-    // think of special player names that will require a different URL type
-
-    public static String createURL(String givenName) {
+    public static String createURL(String givenName) throws Exception {
         String url = "https://en.wikipedia.org/wiki/";
 
-        String[] stringArray = validNameChecker(givenName);
+        String[] stringArray = new String[0];
+        try {
+            stringArray = validNameChecker(givenName);
+        } catch (Exception e) {
+            throw new Exception();
+        }
 
         if (stringArray.length == 2) {
             String first = stringArray[0];
@@ -69,20 +66,8 @@ public class MakeURL {
             last = last.substring(0, 1).toUpperCase() + last.substring(1).toLowerCase();
             url = url + first + "_" + middle + "_" + last;
         }
-
-        //System.out.println(url);
-
         return url;
     }
-
-//    public static String formattedName() {
-//        String[] nameParts = validNameChecker();
-//        if (nameParts.length > 2) {
-//            return nameParts[0] + nameParts[1] + nameParts[2];
-//        } else {
-//            return nameParts[0] + nameParts[1];
-//        }
-//    }
 
     public static String firstNameWithDash(String first) {
         String[] split = first.split("-");
@@ -114,21 +99,3 @@ public class MakeURL {
     }
 
 }
-
-
-//        String[] nameParts = null;
-//        String url = "https://en.wikipedia.org/wiki/";
-//
-//        while (true) {
-//            Pattern pattern = Pattern.compile("^[a-zA-Z\\\\s]*$"); // regex to check for spaces, valid A-Z characters
-//            Matcher matcher = pattern.matcher(playerName);
-//            if (matcher.matches()) {
-//                nameParts = playerName.split(" ");
-//                if (nameParts.length < 2 || nameParts.length > 3) {
-//                    System.out.println("Given name length too short or too long. Enter valid name");
-//                    // no player's name should have less than 2 parts or more than 3 parts
-//                } else System.out.println("Invalid Name. Enter valid name. Name must have only alphabetical letters");
-//            }
-//            break; // break when checked that the string is valid and i have split it up
-//        }
-
